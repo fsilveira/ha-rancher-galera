@@ -6,7 +6,7 @@ Built for use with Docker __17.04.0-ce__+ in __Swarm Mode__
 
 # WORK in Progress!
 
-## Setup
+## Setup Hosts
 ### Init Swarm Nodes/Cluster
 
 Swarm Master:
@@ -19,11 +19,22 @@ Additional Swarm Node(s):
 
 To get the tokens at a later time, run `docker swarm join-token (manager|worker)`
 
-### Create DB network
+### Create DB network (or use docker-compose)
 
 	docker network create -d overlay mysubnet
 
-### Init/Bootstrap DB Cluster 
+## Deploy app with Docker-compose
+
+Docker Compose isn't required if you use swarm, if you need version 3 please show [docker-compose documentation](https://docs.docker.com/compose/install/)
+
+```bash
+docker stack deploy --compose-file docker-compose.yml ha
+docker service scale ha_dbcluster=3
+docker service scale ha_rancher=2
+```
+
+
+## Init MariaDB Cluster 
 
 At first we start with a new service, which is set to `--replicas=1` to turn this instance into a bootstrapping node.
 If there is just one service task running within the cluster, this instance automatically starts with `bootstrapping` enabled. 
