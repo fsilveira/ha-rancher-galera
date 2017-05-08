@@ -1,0 +1,38 @@
+version: "3"
+services:
+  dbcluster:
+    image: "sysc0d/mariadb-cluster"
+    build: ./mariadb-cluster
+    networks:
+      - rancherntw
+    restart: always
+    environment:
+      - DB_SERVICE_NAME=dbcluster
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=cattle
+      - MYSQL_USER=rancher
+      - MYSQL_PASSWORD=passrancher
+      - db-pass=passrancher
+      - db-name=cattle
+#    deploy:
+#      placement:
+#        constraints: [node.role == manager]
+
+  rancher:
+    image: "rancher/server"
+    build: ./rancher
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - rancherntw
+    environment:
+      - db-host=dbcluster
+      - db-port=3306
+      - db-user=rancher
+      - db-pass=passrancher
+      - db-name=cattle
+
+networks:
+  rancherntw:
+    driver: overlay 
