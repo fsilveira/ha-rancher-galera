@@ -26,12 +26,7 @@ services:
       - "8080:8080"
     networks:
       - rancherntw
-    environment:
-      - db-host=dbcluster
-      - db-port=3306
-      - db-user=rancher
-      - db-pass=passrancher
-      - db-name=cattle
+    command: --db-host dbcluster --db-port 3306 --db-user rancher --db-pass passrancher --db-name cattle
 
 networks:
   rancherntw:
