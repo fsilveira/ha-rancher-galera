@@ -4,8 +4,6 @@ __Consider this a POC and not a production ready system!__
 
 Built for use with Docker __17.05.0-ce__+ in __Swarm Mode__
 
-# WORK in Progress!
-
 ## Setup Hosts
 ### Init Swarm Nodes/Cluster
 
@@ -41,7 +39,7 @@ docker service scale ha_rancher=2
 ### Verify cluster nodes
 #### Show services  
 ```bash
-#docker stack services ha
+docker stack services ha
 ID                  NAME                MODE                REPLICAS            IMAGE                           PORTS
 2rnkf52mmd7x        ha_rancher          replicated          2/2                 rancher/server:latest           *:8080->8080/tcp
 ism0wiqtgrls        ha_dbcluster        replicated          3/3                 sysc0d/mariadb-cluster:latest
