@@ -1,8 +1,8 @@
-# docker-mariadb-cluster
+# HA Rancher Galera
 
 __Consider this a POC and not a production ready system!__ 
 
-Built for use with Docker __17.04.0-ce__+ in __Swarm Mode__
+Built for use with Docker __17.05.0-ce__+ in __Swarm Mode__
 
 # WORK in Progress!
 
@@ -19,9 +19,9 @@ Additional Swarm Node(s):
 
 To get the tokens at a later time, run `docker swarm join-token (manager|worker)`
 
-### Create DB network (or use docker-compose)
+### Create Rancher network
 
-	docker network create -d overlay mysubnet
+	docker network create -o encrypted -d overlay --ingress rancher-ingress
 
 ## Deploy app with Docker-compose
 

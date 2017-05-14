@@ -4,7 +4,7 @@ services:
     image: "sysc0d/mariadb-cluster"
     build: ./mariadb-cluster
     networks:
-      - rancherntw
+      - rancher-ingress
     restart: always
     environment:
       - DB_SERVICE_NAME=dbcluster
@@ -14,20 +14,16 @@ services:
       - MYSQL_PASSWORD=passrancher
       - db-pass=passrancher
       - db-name=cattle
-#    deploy:
-#      placement:
-#        constraints: [node.role == manager]
 
   rancher:
     image: "rancher/server"
-    #build: ./rancher
+    networks:
+      - rancher-ingress
     restart: always
     ports:
       - "8080:8080"
-    networks:
-      - rancherntw
     command: --db-host dbcluster --db-port 3306 --db-user rancher --db-pass passrancher --db-name cattle
 
 networks:
-  rancherntw:
-    driver: overlay 
+  rancher-ingress:
+    external: true
