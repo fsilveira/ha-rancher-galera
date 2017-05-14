@@ -20,9 +20,14 @@ Additional Swarm Node(s):
 To get the tokens at a later time, run `docker swarm join-token (manager|worker)`
 
 ### Create Rancher network
+#### Create custom ingress if not exist (for docker >= 17.05.0-ce)
 
-	docker network create -o encrypted -d overlay --ingress rancher-ingress
+	docker network create -d overlay --ingress rancher-ingress
 
+#### Create custom network 
+
+        docker network create -d overlay --opt encrypted rancherntw
+	
 ## Deploy app with Docker-compose
 
 Docker Compose isn't required if you use swarm, if you need version 3 please show [docker-compose documentation](https://docs.docker.com/compose/install/)
@@ -33,52 +38,16 @@ docker service scale ha_dbcluster=3
 docker service scale ha_rancher=2
 ```
 
-
-## Init MariaDB Cluster 
-
-At first we start with a new service, which is set to `--replicas=1` to turn this instance into a bootstrapping node.
-If there is just one service task running within the cluster, this instance automatically starts with `bootstrapping` enabled. 
-
-	docker service create --name dbcluster \
-	--network mydbnet \
-	--replicas=1 \
-	--env DB_SERVICE_NAME=dbcluster \
-	sysc0d/mariadb-cluster
-
-Note: the service name provided by `--name` has to match the environment variable __DB_SERVICE_NAME__ set with `--env DB_SERVICE_NAME`.
-	
-Of course there are the default MariaDB options to define a root password, create a database, create a user and set a password for this user.
-Example:
-
-	docker service create --name dbcluster \
-	--network mydbnet \
-	--replicas=1 \
-	--env DB_SERVICE_NAME=dbcluster \
-	--env MYSQL_ROOT_PASSWORD=rootpass \
-	--env MYSQL_DATABASE=mydb \
-	--env MYSQL_USER=mydbuser \
-	--env MYSQL_PASSWORD=mydbpass \
-	sysc0d/mariadb-cluster
-
-### Scale out additional cluster members
-Just after the first service instance/task is running with we are good to scale out.
-Check service with `docker service ps dbcluster`. The result should look like this, with __CURRENT STATE__ telling something like __Running__.
-
-	ID                         NAME         IMAGE                    NODE    DESIRED STATE  CURRENT STATE           ERROR
-	7c81muy053eoc28p5wrap2uzn  dbcluster.1  sysc0d/mariadb-cluster  node01  Running        Running 41 seconds ago  
-
-Lets scale out now:
-
-	docker service scale dbcluster=3
-
-This additional 2 nodes start will come up in "cluster join"-mode. Lets check again: `docker service ps dbcluster`
-
-	ID                         NAME         IMAGE                    NODE    DESIRED STATE  CURRENT STATE               ERROR
-	7c81muy053eoc28p5wrap2uzn  dbcluster.1  sysc0d/mariadb-cluster  node01  Running        Running 6 minutes ago       
-	8ht037ka0j4g6lnhc194pxqfn  dbcluster.2  sysc0d/mariadb-cluster  node02  Running        Running about a minute ago  
-	bgk07betq9pwgkgpd3eoozu6u  dbcluster.3  sysc0d/mariadb-cluster  node03  Running        Running about a minute ago 
-
 ### Verify cluster nodes
+#### Show services  
+```bash
+#docker stack services ha
+ID                  NAME                MODE                REPLICAS            IMAGE                           PORTS
+2rnkf52mmd7x        ha_rancher          replicated          2/2                 rancher/server:latest           *:8080->8080/tcp
+ism0wiqtgrls        ha_dbcluster        replicated          3/3                 sysc0d/mariadb-cluster:latest
+```
+
+#### Verify cluster DB
 ```bash
 docker exec -it dbcluster.<RN>.<ID> mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
 +--------------------+-------+
