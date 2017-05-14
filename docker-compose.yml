@@ -4,7 +4,7 @@ services:
     image: "sysc0d/mariadb-cluster"
     build: ./mariadb-cluster
     networks:
-      - rancher-ingress
+      - rancherntw
     restart: always
     environment:
       - DB_SERVICE_NAME=dbcluster
@@ -18,12 +18,12 @@ services:
   rancher:
     image: "rancher/server"
     networks:
-      - rancher-ingress
+      - rancherntw
     restart: always
     ports:
       - "8080:8080"
     command: --db-host dbcluster --db-port 3306 --db-user rancher --db-pass passrancher --db-name cattle
 
 networks:
-  rancher-ingress:
+  rancherntw:
     external: true
