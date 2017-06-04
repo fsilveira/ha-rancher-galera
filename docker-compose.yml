@@ -5,6 +5,8 @@ services:
     build: ./mariadb-cluster
     networks:
       - rancherntw
+    volumes:
+      - data-db:/var/lib/mysql
     restart: always
     environment:
       - DB_SERVICE_NAME=dbcluster
@@ -23,6 +25,9 @@ services:
     ports:
       - "8080:8080"
     command: --db-host dbcluster --db-port 3306 --db-user rancher --db-pass passrancher --db-name cattle
+
+volumes:
+  data-db:
 
 networks:
   rancherntw:
